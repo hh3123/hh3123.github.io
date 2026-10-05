@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Health checks that actually catch failures</title>
+<meta name="description" content="Container health probes.">
+<link rel="stylesheet" href="../assets/style.css"></head><body>
+<header><nav><a class="brand" href="../">hh3123</a>
+<a href="../projects.html">Projects</a>
+<a href="../blog.html">Blog</a>
+<a href="../about.html">About</a></nav></header><main>
+
+<h1>Health checks that actually catch failures</h1><time>2026-09-28</time>
+<p class="lead">A health probe is only useful if it fails when the service is broken.</p>
+<p>Most containers ship a liveness probe that opens a TCP connection. That tells you the process
+is listening &mdash; not that it can serve a request. A worker whose database pool is exhausted,
+or whose event loop is blocked, will happily accept the socket and then time out on every real
+call.</p>
+<h2>Probe the request path</h2>
+<p>Expose a dedicated endpoint that exercises the same dependencies the service needs to do its
+job, and keep it cheap: one query, one cache read, with a short timeout.</p>
+<pre>async def health():
+    await db.fetchval("select 1")
+    await cache.ping()
+    return {"ok": True}</pre>
+<h2>Separate liveness from readiness</h2>
+<p>Liveness should answer "is this process wedged?" and nothing else. Readiness answers "should
+traffic come here?". Mixing them means a slow dependency restarts a perfectly good process.</p>
+<ul><li><code>/livez</code> returns 200 unless the event loop is stuck.</li>
+<li><code>/readyz</code> checks dependencies and may fail transiently.</li>
+<li>Restart only on liveness failure, drain only on readiness failure.</li></ul>
+<h2>Timeouts are part of the contract</h2>
+<p>Give the probe a deadline shorter than the orchestrator's timeout, so you return a structured
+failure instead of being killed mid-check. A probe that hangs is indistinguishable from a dead
+process.</p>
+</main><footer><div class="in">&copy; 2026 hh3123 &middot; personal developer site &middot;
+<a href="mailto:domreg-isadev@mail.com">domreg-isadev@mail.com</a></div></footer></body></html>
