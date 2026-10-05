@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Backpressure in asyncio pipelines</title>
+<meta name="description" content="Bounded queues in asyncio.">
+<link rel="stylesheet" href="../assets/style.css"></head><body>
+<header><nav><a class="brand" href="../">hh3123</a>
+<a href="../projects.html">Projects</a>
+<a href="../blog.html">Blog</a>
+<a href="../about.html">About</a></nav></header><main>
+
+<h1>Backpressure in asyncio pipelines</h1><time>2026-09-12</time>
+<p class="lead">An unbounded queue turns a slow consumer into a memory leak with extra steps.</p>
+<p>When a producer is faster than a consumer, something has to give: throughput, memory, or the
+producer. An <code>asyncio.Queue()</code> with no bound chooses memory, quietly, until the box
+falls over.</p>
+<h2>Bound the queue</h2>
+<pre>queue: asyncio.Queue[Item] = asyncio.Queue(maxsize=1000)
+
+async def produce(items):
+    for it in items:
+        await queue.put(it)   # blocks when full -> natural backpressure</pre>
+<p><code>put()</code> awaiting is the whole trick: the producer now yields when the pipeline is
+saturated instead of buffering without limit.</p>
+<h2>Cancellation is the other half</h2>
+<p>Backpressure only works if shutdown is clean. On <code>SIGTERM</code>, stop producing, let the
+queue drain up to a deadline, then cancel workers. Tasks that catch <code>CancelledError</code>
+and keep going are how you get a zombie pipeline that never exits.</p>
+<h2>Measure the depth</h2>
+<p>The queue depth is your most useful saturation signal. Export it as a gauge; alert when it sits
+near the bound for longer than a burst. Throughput charts hide saturation until it is too late,
+depth does not.</p>
+</main><footer><div class="in">&copy; 2026 hh3123 &middot; personal developer site &middot;
+<a href="mailto:domreg-isadev@mail.com">domreg-isadev@mail.com</a></div></footer></body></html>
