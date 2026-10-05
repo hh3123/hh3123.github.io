@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Projects — hh3123</title>
+<meta name="description" content="Selected software projects.">
+<link rel="stylesheet" href="assets/style.css"></head><body>
+<header><nav><a class="brand" href="">hh3123</a>
+<a href="projects.html">Projects</a>
+<a href="blog.html">Blog</a>
+<a href="about.html">About</a></nav></header><main>
+
+<h1>Projects</h1>
+<p class="lead">Open-source work and the tools I reach for when something has to stay up.</p>
+<div class="card"><h3>ds-bot</h3>
+<p class="mut">A Python service that connects a real-time voice pipeline to a chat platform.
+It keeps a per-guild session, streams audio through an isolated worker process and surfaces
+health through a small HTTP probe. Built as a Docker image with a tests/ suite; the synthesis
+stage is backend-agnostic.</p>
+<p><span class="tag">python</span><span class="tag">asyncio</span><span class="tag">docker</span><span class="tag">pytest</span></p></div>
+<div class="card"><h3>pipe-tools</h3>
+<p class="mut">A CLI for composing streaming stages: <code>source | transform | sink</code>,
+with bounded channels, graceful shutdown and per-stage counters. Useful for local data munging
+where a full framework is overkill.</p>
+<p><span class="tag">go</span><span class="tag">cli</span></p></div>
+<div class="card"><h3>logpipe</h3>
+<p class="mut">Structured-log shipper: parses JSON logs, applies redaction rules for secrets,
+and forwards batches to a collector with retry and a disk-backed buffer.</p>
+<p><span class="tag">python</span><span class="tag">observability</span></p></div>
+<div class="card"><h3>infra-notes</h3>
+<p class="mut">Runbooks and container recipes for common self-hosted pieces: reverse proxy,
+queue, scheduler, backup. Everything as a copy-pasteable compose file.</p>
+<p><span class="tag">docker</span><span class="tag">ops</span></p></div>
+</main><footer><div class="in">&copy; 2026 hh3123 &middot; personal developer site &middot;
+<a href="mailto:domreg-isadev@mail.com">domreg-isadev@mail.com</a></div></footer></body></html>
