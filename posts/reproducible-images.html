@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reproducible Python images</title>
+<meta name="description" content="Reproducible Docker builds for Python.">
+<link rel="stylesheet" href="../assets/style.css"></head><body>
+<header><nav><a class="brand" href="../">hh3123</a>
+<a href="../projects.html">Projects</a>
+<a href="../blog.html">Blog</a>
+<a href="../about.html">About</a></nav></header><main>
+
+<h1>Reproducible Python images, line by line</h1><time>2026-08-30</time>
+<p class="lead">If the image hash changes when only your source changes, your layers are wrong.</p>
+<p>A good Python image rebuilds dependencies only when dependencies change. Most Dockerfiles
+rebuild them on every commit because the manifest is copied after the source, or because the
+lockfile is not honoured.</p>
+<h2>Copy and install first</h2>
+<pre>COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
+COPY . .
+RUN uv sync --frozen --no-dev</pre>
+<p>The first install is cached as long as the manifest is unchanged; the second is a no-op that
+only re-checks the virtualenv.</p>
+<h2>Pin the base too</h2>
+<p><code>FROM python:3.12-slim</code> moves under you. Pin a digest when you need bit-for-bit
+reproducibility, and bump it deliberately with a changelog entry.</p>
+<h2>Keep the runtime minimal</h2>
+<ul><li>Multi-stage build: compile wheels in a builder, copy the venv into a slim runtime.</li>
+<li>No build toolchain in the final layer.</li>
+<li>Run as a non-root user with an explicit <code>USER</code>.</li></ul>
+</main><footer><div class="in">&copy; 2026 hh3123 &middot; personal developer site &middot;
+<a href="mailto:domreg-isadev@mail.com">domreg-isadev@mail.com</a></div></footer></body></html>
